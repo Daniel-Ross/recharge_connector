@@ -15,5 +15,13 @@ def get_next_url(response_data, url):
 
 
 def progress_generator():
+    """Generator function for infinite progress updates.
+    
+    Used with tqdm to provide progress bar updates during API pagination.
+    Each yield signals one page of data has been processed.
+    
+    Yields:
+        None: Signals completion of one pagination step
+    """
     while True:
         yield

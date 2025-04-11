@@ -4,11 +4,11 @@ import requests
 import json
 import time
 import polars as pl
-from .utils import get_next_url, progress_generator
+from .utils import get_next_url
 
 
 def pull_active_subs():
-    """Retrieves and processes subscription data from the Recharge API.
+    """Retrieves and processes active subscription data from the Recharge API.
     This function fetches all active subscriptions using pagination, processes the raw data,
     and returns it in a structured Polars DataFrame format. It handles the API pagination,
     includes rate limiting protection, and transforms the subscription data by:
@@ -20,7 +20,7 @@ def pull_active_subs():
         requests.exceptions.RequestException: If there is an error making the API request
         json.JSONDecodeError: If the API response cannot be parsed as JSON
     Returns:
-        pl.DataFrame: A Polars DataFrame containing processed subscription data 
+        pl.DataFrame: A Polars DataFrame containing processed subscription data
     Note:
         The function uses pagination to retrieve all active subscriptions and includes
         a 0.5 second delay between API calls to prevent rate limiting.
@@ -33,7 +33,6 @@ def pull_active_subs():
         response = requests.get(url, headers=HEADERS)
         data = json.loads(response.text)
         for sub in data.get("subscriptions", []):
-            # print(sub)
             all_subs.append(sub)
         if not data.get("next_cursor"):
             break
