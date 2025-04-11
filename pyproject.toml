@@ -1,0 +1,22 @@
+[project]
+name = "recharge-connector"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Dan Ross", email = "daniel.ross@aop.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "polars>=1.27.1",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.3",
+    "tqdm>=4.67.1",
+]
+
+[project.scripts]
+recharge-connector = "recharge_connector:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
