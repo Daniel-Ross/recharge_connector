@@ -1,7 +1,8 @@
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 __author__ = "Daniel Ross"
 
-from .get_subs import pull_subs
+from .get_subs import pull_active_subs
+
 __all__ = [
    "pull_active_subs" 
 ]
