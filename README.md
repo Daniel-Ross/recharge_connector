@@ -55,13 +55,38 @@ To set up the development environment:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+.venv\Scripts\activate  # On Windows
+# source .venv/bin/activate  # On Linux/MacOS
 pip install -e .
 ```
 
-## License
+### Using UV (Optional)
 
-[Add your license here]
+For faster dependency resolution and installation, you can use [uv](https://github.com/astral-sh/uv):
+
+#### Windows Installation
+```powershell
+# Install with PowerShell
+(Invoke-WebRequest -Uri https://github.com/astral-sh/uv/releases/latest/download/uv-windows-x64.zip -OutFile uv.zip)
+Expand-Archive -Path uv.zip -DestinationPath $env:LOCALAPPDATA\uv
+$oldPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+$uvPath = "$env:LOCALAPPDATA\uv"
+[Environment]::SetEnvironmentVariable('Path', "$oldPath;$uvPath", 'User')
+```
+
+#### Linux/MacOS Installation
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+#### Using UV
+```bash
+# Create virtual environment and install dependencies
+uv venv
+.venv\Scripts\activate  # On Windows
+# source .venv/bin/activate  # On Linux/MacOS
+uv pip install -e .
+```
 
 ## Author
 
