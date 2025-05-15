@@ -1,17 +1,17 @@
 [project]
 name = "recharge-connector"
-version = "0.1.0"
+version = "1.1.0"
 description = "Add your description here"
 readme = "README.md"
-authors = [
-    { name = "Dan Ross", email = "daniel.ross@aop.com" }
-]
+authors = [{ name = "Dan Ross", email = "daniel.ross@aop.com" }]
 requires-python = ">=3.12"
 dependencies = [
+    "fastexcel>=0.14.0",
     "polars>=1.27.1",
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",
     "tqdm>=4.67.1",
+    "xlsxwriter>=3.2.3",
 ]
 
 [project.scripts]
