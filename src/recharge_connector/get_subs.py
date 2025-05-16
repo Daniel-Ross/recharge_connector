@@ -74,3 +74,8 @@ def pull_active_subs() -> pl.DataFrame:
     )
 
     return sub_frame
+
+
+if __name__ == "__main__":
+    subs = pull_active_subs()
+    print("Done")
