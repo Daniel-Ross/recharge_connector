@@ -9,9 +9,9 @@ HEADERS = {
     "Accept": "application/json",
 }
 BASE_URL = "https://api.rechargeapps.com"
-BASE_ORDER_URL = BASE_URL + "/subscriptions"
+BASE_SUB_URL = BASE_URL + "/subscriptions"
 ACTIVE_SUB_PRED = "?limit=250&status=active"
-ACTIVE_SUB_URL = BASE_ORDER_URL + ACTIVE_SUB_PRED
+ACTIVE_SUB_URL = BASE_URL + ACTIVE_SUB_PRED
 BASE_ORDER_URL = BASE_URL + "/orders"
 ALL_PROCESSED_ORDERS_URL = BASE_ORDER_URL + "?limit=250&status=success"
 ORDERS_PROCESSED_BY_ID_URL = ALL_PROCESSED_ORDERS_URL + "&ids="
