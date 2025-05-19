@@ -8,7 +8,7 @@ import requests
 import json
 import time
 import polars as pl
-from recharge_connector.utils import get_next_url
+from recharge_connector.utils import get_next_url, create_order_df
 
 
 def pull_orders_by_ids(ids: list) -> pl.DataFrame:
@@ -39,7 +39,7 @@ def pull_orders_by_ids(ids: list) -> pl.DataFrame:
     """
 
     url = ORDERS_PROCESSED_BY_ID_URL + ",".join(ids)
-    print(url)
+    # print(url)
     all_orders = []
     progress = tqdm()
     while True:
@@ -55,48 +55,32 @@ def pull_orders_by_ids(ids: list) -> pl.DataFrame:
             if not url:
                 break
         time.sleep(0.5)
-    order_frame = pl.from_dicts(all_orders, infer_schema_length=10000)
-    order_frame = order_frame.explode("line_items")
-    order_frame = order_frame.with_columns(
-        recharge_customer_id=pl.col("customer").struct.field("id"),
-        shopify_customer_id=pl.col("customer")
-        .struct.field("external_customer_id")
-        .struct.field("ecommerce"),
-        customer_email=pl.col("customer").struct.field("email"),
-        shopify_order_name=pl.col("external_order_name").struct.field("ecommerce"),
-        shopify_order_id=pl.col("external_order_id").struct.field("ecommerce"),
-        shopify_product_id=pl.col("line_items")
-        .struct.field("external_product_id")
-        .struct.field("ecommerce"),
-        shopify_variant_id=pl.col("line_items")
-        .struct.field("external_variant_id")
-        .struct.field("ecommerce"),
-        subscription_id=pl.col("line_items").struct.field("purchase_item_id"),
-        line_item_properties=pl.col("line_items").struct.field("properties"),
-        sku=pl.col("line_items").struct.field("sku"),
-        qty=pl.col("line_items").struct.field("quantity"),
-        product_title=pl.col("line_items").struct.field("title"),
-        charge_id=pl.col("charge").struct.field("id"),
-    )
-
-    # order_frame = order_frame.unnest("line_item_properties")
-    order_frame = order_frame.drop(
-        [
-            "billing_address",
-            "currency",
-            "total_weight_grams",
-            "shipping_address",
-            "shipping_lines",
-            "client_details",
-            "customer",
-            "tax_lines",
-            "line_items",
-            "is_prepaid",
-            "external_order_number",
-            "external_order_name",
-            "external_order_id",
-            "external_cart_token",
-            "charge",
-        ]
-    )
+    order_frame = create_order_df(all_orders)
     return order_frame
+
+
+def pull_all_orders():
+    url = BASE_ORDER_URL
+    # print(url)
+    all_orders = []
+    progress = tqdm()
+    while True:
+        progress.update()
+        response = requests.get(url, headers=HEADERS)
+        data = json.loads(response.text)
+        for order in data.get("orders", []):
+            all_orders.append(order)
+        if not data.get("next_cursor"):
+            break
+        else:
+            url = get_next_url(data, BASE_ORDER_URL)
+            if not url:
+                break
+        time.sleep(0.5)
+    order_frame = create_order_df(all_orders)
+    return order_frame
+
+
+if __name__ == "__main__":
+    data = pull_all_orders()
+    print("Done")
