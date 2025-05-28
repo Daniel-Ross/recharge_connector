@@ -59,9 +59,12 @@ def pull_orders_by_ids(ids: list) -> pl.DataFrame:
     return order_frame
 
 
-def pull_all_orders():
-    url = BASE_ORDER_URL
-    # print(url)
+def pull_all_orders(start_date: str = "", end_date: str = ""):
+    if start_date and end_date:
+        url = BASE_ORDER_URL + f"?created_at_min={start_date}&created_at_max={end_date}"
+    else:
+        url = BASE_ORDER_URL
+    print(url)
     all_orders = []
     progress = tqdm()
     while True:
@@ -82,5 +85,5 @@ def pull_all_orders():
 
 
 if __name__ == "__main__":
-    data = pull_all_orders()
+    data = pull_all_orders(start_date="2025-05-01", end_date="2025-05-04")
     print("Done")
