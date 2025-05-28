@@ -46,6 +46,32 @@ def pull_active_subs() -> pl.DataFrame:
 
 
 def pull_cancelled_subs(start_date: str = "", end_date: str = "") -> pl.DataFrame:
+    """
+    Pulls cancelled subscriptions data from the Recharge API and returns it as a Polars DataFrame.
+    This function fetches all cancelled subscriptions within the specified date range (if provided).
+    The data is retrieved through paginated API requests and combined into a single DataFrame.
+
+    Parameters
+    ----------
+    start_date : str, optional
+        The minimum creation date for subscriptions to include in the format 'YYYY-MM-DD'.
+        If not provided, no lower date boundary will be applied.
+    end_date : str, optional
+        The maximum creation date for subscriptions to include in the format 'YYYY-MM-DD'.
+        If not provided, no upper date boundary will be applied.
+
+    Returns
+    -------
+    pl.DataFrame
+        A Polars DataFrame containing the cancelled subscription data with processed columns.
+
+    Notes
+    -----
+    - The function uses a progress bar to track API request progress.
+    - Requests are rate-limited with 0.5 second delays between calls.
+    - Both start_date and end_date need to be provided to apply date filtering.
+    """
+
     all_subs = []
     if start_date and end_date:
         url = CANCELLED_SUB_URL + f"&created_at_min={start_date}&created_at_max={end_date}"
