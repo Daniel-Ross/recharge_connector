@@ -45,9 +45,13 @@ def pull_active_subs() -> pl.DataFrame:
     return sub_frame
 
 
-def pull_cancelled_subs() -> pl.DataFrame:
+def pull_cancelled_subs(start_date: str = "", end_date: str = "") -> pl.DataFrame:
     all_subs = []
-    url = CANCELLED_SUB_URL
+    if start_date and end_date:
+        url = CANCELLED_SUB_URL + f"&created_at_min={start_date}&created_at_max={end_date}"
+    else:
+        url = CANCELLED_SUB_URL
+    print(url)
     progress = tqdm()
     while True:
         progress.update()
@@ -67,5 +71,5 @@ def pull_cancelled_subs() -> pl.DataFrame:
 
 
 if __name__ == "__main__":
-    subs = pull_active_subs()
+    subs = pull_cancelled_subs()
     print("Done")
