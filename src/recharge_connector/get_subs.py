@@ -1,14 +1,10 @@
-from recharge_connector.configs import (
-    ACTIVE_SUB_URL,
-    BASE_SUB_URL,
-    HEADERS,
-)
+from recharge_connector.configs import ACTIVE_SUB_URL, BASE_SUB_URL, HEADERS, CANCELLED_SUB_URL
 from tqdm import tqdm
 import requests
 import json
 import time
 import polars as pl
-from recharge_connector.utils import get_next_url
+from recharge_connector.utils import get_next_url, create_sub_df
 
 
 def pull_active_subs() -> pl.DataFrame:
@@ -45,34 +41,28 @@ def pull_active_subs() -> pl.DataFrame:
             if not url:
                 break
         time.sleep(0.5)
-    sub_frame = pl.from_dicts(all_subs, infer_schema_length=10000)
-    sub_frame = sub_frame.with_columns(sub_frame.unnest("external_variant_id"))
-    sub_frame = sub_frame.rename({"ecommerce": "external_variant_id_processed"})
-    sub_frame = sub_frame.with_columns(sub_frame.unnest("external_product_id"))
-    sub_frame = sub_frame.rename({"ecommerce": "external_product_id_processed"})
-    sub_frame = sub_frame.with_columns(
-        pl.col("external_variant_id_processed").cast(pl.Int64),
-        pl.col("external_product_id_processed").cast(pl.Int64),
-        pl.col("price").cast(pl.Float64),
-    )
-    sub_frame = sub_frame.drop(
-        [
-            "address_id",
-            "analytics_data",
-            "cancellation_reason",
-            "cancellation_reason_comments",
-            "cancelled_at",
-            "has_queued_charges",
-            "is_prepaid",
-            "is_swappable",
-            "max_retries_reached",
-            "order_day_of_month",
-            "order_day_of_week",
-            "presentment_currency",
-            "sku_override",
-        ]
-    )
+    sub_frame = create_sub_df(all_subs)
+    return sub_frame
 
+
+def pull_cancelled_subs() -> pl.DataFrame:
+    all_subs = []
+    url = CANCELLED_SUB_URL
+    progress = tqdm()
+    while True:
+        progress.update()
+        response = requests.get(url, headers=HEADERS)
+        data = json.loads(response.text)
+        for sub in data.get("subscriptions", []):
+            all_subs.append(sub)
+        if not data.get("next_cursor"):
+            break
+        else:
+            url = get_next_url(data, BASE_SUB_URL)
+            if not url:
+                break
+        time.sleep(0.5)
+    sub_frame = create_sub_df(all_subs)
     return sub_frame
 
 

@@ -76,3 +76,50 @@ def create_order_df(order_list: list[dict]) -> pl.DataFrame:
         ]
     )
     return order_frame
+
+
+def create_sub_df(sub_list: list[dict]) -> pl.DataFrame:
+    """Transform raw subscription data into a structured Polars DataFrame.
+
+    This function processes a list of subscription dictionaries from the Recharge API
+    and transforms them into a clean, well-structured Polars DataFrame by:
+    - Unnesting external_variant_id and external_product_id fields
+    - Converting Shopify variant and product IDs to proper numeric types
+    - Converting price values to float
+    - Removing unnecessary fields that add noise to the data
+
+    Args:
+        sub_list (list[dict]): List of subscription dictionaries retrieved from the Recharge API
+
+    Returns:
+        pl.DataFrame: A cleaned and structured Polars DataFrame containing subscription data
+    """
+    sub_frame = pl.from_dicts(sub_list, infer_schema_length=10000)
+    sub_frame = sub_frame.with_columns(sub_frame.unnest("external_variant_id"))
+    sub_frame = sub_frame.rename({"ecommerce": "external_variant_id_processed"})
+    sub_frame = sub_frame.with_columns(sub_frame.unnest("external_product_id"))
+    sub_frame = sub_frame.rename({"ecommerce": "external_product_id_processed"})
+    sub_frame = sub_frame.with_columns(
+        pl.col("external_variant_id_processed").cast(pl.Int64),
+        pl.col("external_product_id_processed").cast(pl.Int64),
+        pl.col("price").cast(pl.Float64),
+    )
+    sub_frame = sub_frame.drop(
+        [
+            "address_id",
+            "analytics_data",
+            "cancellation_reason",
+            "cancellation_reason_comments",
+            "cancelled_at",
+            "has_queued_charges",
+            "is_prepaid",
+            "is_swappable",
+            "max_retries_reached",
+            "order_day_of_month",
+            "order_day_of_week",
+            "presentment_currency",
+            "sku_override",
+        ]
+    )
+
+    return sub_frame
