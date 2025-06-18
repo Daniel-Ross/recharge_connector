@@ -1,4 +1,4 @@
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 __author__ = "Daniel Ross"
 
 from .get_subs import pull_active_subs, pull_cancelled_subs
