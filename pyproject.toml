@@ -1,6 +1,6 @@
 [project]
 name = "recharge-connector"
-version = "1.4.0"
+version = "1.4.1"
 description = "Utility to retrieve data from Recharge"
 readme = "README.md"
 authors = [{ name = "Dan Ross", email = "daniel.ross@aop.com" }]

@@ -11,6 +11,7 @@ try:
     }
 except KeyError:
     print("Recharge tokens not found in env. Supply header manually.")
+    HEADERS = ""
 
 BASE_URL = "https://api.rechargeapps.com"
 BASE_SUB_URL = BASE_URL + "/subscriptions"
