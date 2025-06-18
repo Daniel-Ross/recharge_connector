@@ -71,7 +71,7 @@ def pull_cancelled_subs(start_date: str = "", end_date: str = "", headers=None) 
     - Requests are rate-limited with 0.5 second delays between calls.
     - Both start_date and end_date need to be provided to apply date filtering.
     """
-
+    print(headers)
     all_subs = []
     if start_date and end_date:
         url = CANCELLED_SUB_URL + f"&created_at_min={start_date}&created_at_max={end_date}"
