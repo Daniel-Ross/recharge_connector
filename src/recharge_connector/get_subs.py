@@ -1,4 +1,4 @@
-from recharge_connector.configs import ACTIVE_SUB_URL, BASE_SUB_URL, CANCELLED_SUB_URL
+from recharge_connector.configs import ACTIVE_SUB_URL, BASE_SUB_URL, CANCELLED_SUB_URL, HEADERS
 from tqdm import tqdm
 import requests
 import json
@@ -7,7 +7,7 @@ import polars as pl
 from recharge_connector.utils import get_next_url, create_sub_df
 
 
-def pull_active_subs(headers) -> pl.DataFrame:
+def pull_active_subs() -> pl.DataFrame:
     """Retrieves and processes active subscription data from the Recharge API.
     This function fetches all active subscriptions using pagination, processes the raw data,
     and returns it in a structured Polars DataFrame format. It handles the API pagination,
@@ -30,7 +30,7 @@ def pull_active_subs(headers) -> pl.DataFrame:
     progress = tqdm()
     while True:
         progress.update()
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=HEADERS)
         data = json.loads(response.text)
         for sub in data.get("subscriptions", []):
             all_subs.append(sub)
@@ -45,7 +45,7 @@ def pull_active_subs(headers) -> pl.DataFrame:
     return sub_frame
 
 
-def pull_cancelled_subs(headers, start_date: str = "", end_date: str = "") -> pl.DataFrame:
+def pull_cancelled_subs(start_date: str = "", end_date: str = "") -> pl.DataFrame:
     """
     Pulls cancelled subscriptions data from the Recharge API and returns it as a Polars DataFrame.
     This function fetches all cancelled subscriptions within the specified date range (if provided).
@@ -71,7 +71,6 @@ def pull_cancelled_subs(headers, start_date: str = "", end_date: str = "") -> pl
     - Requests are rate-limited with 0.5 second delays between calls.
     - Both start_date and end_date need to be provided to apply date filtering.
     """
-    print(headers)
     all_subs = []
     if start_date and end_date:
         url = CANCELLED_SUB_URL + f"&created_at_min={start_date}&created_at_max={end_date}"
@@ -81,7 +80,7 @@ def pull_cancelled_subs(headers, start_date: str = "", end_date: str = "") -> pl
     progress = tqdm()
     while True:
         progress.update()
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, HEADERS)
         data = json.loads(response.text)
         for sub in data.get("subscriptions", []):
             all_subs.append(sub)

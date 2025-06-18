@@ -1,17 +1,13 @@
 from dotenv import dotenv_values
 
 CONFIGS = dotenv_values()
-try:
-    STAGING_TOKEN = CONFIGS["staging_api_token"]
-    PROD_TOKEN = CONFIGS["prod_api_token"]
-    HEADERS = {
-        "X-Recharge-Access-Token": PROD_TOKEN,
-        "X-Recharge-Version": "2021-11",
-        "Accept": "application/json",
-    }
-except KeyError:
-    print("Recharge tokens not found in env. Supply header manually.")
-    HEADERS = ""
+STAGING_TOKEN = CONFIGS["staging_api_token"]
+PROD_TOKEN = CONFIGS["prod_api_token"]
+HEADERS = {
+    "X-Recharge-Access-Token": PROD_TOKEN,
+    "X-Recharge-Version": "2021-11",
+    "Accept": "application/json",
+}
 
 BASE_URL = "https://api.rechargeapps.com"
 BASE_SUB_URL = BASE_URL + "/subscriptions"
