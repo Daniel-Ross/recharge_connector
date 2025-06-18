@@ -11,7 +11,7 @@ import polars as pl
 from recharge_connector.utils import get_next_url, create_order_df
 
 
-def pull_orders_by_ids(ids: list, headers=HEADERS) -> pl.DataFrame:
+def pull_orders_by_ids(headers, ids: list) -> pl.DataFrame:
     """Retrieves and processes order data for specified order IDs from the Recharge API.
 
     This function fetches order data for a list of order IDs, processes the raw data,
@@ -59,7 +59,7 @@ def pull_orders_by_ids(ids: list, headers=HEADERS) -> pl.DataFrame:
     return order_frame
 
 
-def pull_all_orders(start_date: str = "", end_date: str = "", headers=HEADERS):
+def pull_all_orders(headers, start_date: str = "", end_date: str = ""):
     if start_date and end_date:
         url = BASE_ORDER_URL + f"?created_at_min={start_date}&created_at_max={end_date}"
     else:
@@ -85,5 +85,5 @@ def pull_all_orders(start_date: str = "", end_date: str = "", headers=HEADERS):
 
 
 if __name__ == "__main__":
-    data = pull_all_orders(start_date="2025-05-01", end_date="2025-05-04")
+    data = pull_all_orders(headers=HEADERS, start_date="2025-05-01", end_date="2025-05-04")
     print("Done")
