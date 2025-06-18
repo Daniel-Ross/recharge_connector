@@ -1,4 +1,4 @@
-from recharge_connector.configs import ACTIVE_SUB_URL, BASE_SUB_URL, HEADERS, CANCELLED_SUB_URL
+from recharge_connector.configs import ACTIVE_SUB_URL, BASE_SUB_URL, CANCELLED_SUB_URL
 from tqdm import tqdm
 import requests
 import json
@@ -7,7 +7,7 @@ import polars as pl
 from recharge_connector.utils import get_next_url, create_sub_df
 
 
-def pull_active_subs(headers=HEADERS) -> pl.DataFrame:
+def pull_active_subs(headers=None) -> pl.DataFrame:
     """Retrieves and processes active subscription data from the Recharge API.
     This function fetches all active subscriptions using pagination, processes the raw data,
     and returns it in a structured Polars DataFrame format. It handles the API pagination,
@@ -45,7 +45,7 @@ def pull_active_subs(headers=HEADERS) -> pl.DataFrame:
     return sub_frame
 
 
-def pull_cancelled_subs(start_date: str = "", end_date: str = "", headers=HEADERS) -> pl.DataFrame:
+def pull_cancelled_subs(start_date: str = "", end_date: str = "", headers=None) -> pl.DataFrame:
     """
     Pulls cancelled subscriptions data from the Recharge API and returns it as a Polars DataFrame.
     This function fetches all cancelled subscriptions within the specified date range (if provided).
