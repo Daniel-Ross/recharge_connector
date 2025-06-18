@@ -7,7 +7,7 @@ import polars as pl
 from recharge_connector.utils import get_next_url, create_sub_df
 
 
-def pull_active_subs() -> pl.DataFrame:
+def pull_active_subs(headers=HEADERS) -> pl.DataFrame:
     """Retrieves and processes active subscription data from the Recharge API.
     This function fetches all active subscriptions using pagination, processes the raw data,
     and returns it in a structured Polars DataFrame format. It handles the API pagination,
@@ -30,7 +30,7 @@ def pull_active_subs() -> pl.DataFrame:
     progress = tqdm()
     while True:
         progress.update()
-        response = requests.get(url, headers=HEADERS)
+        response = requests.get(url, headers=headers)
         data = json.loads(response.text)
         for sub in data.get("subscriptions", []):
             all_subs.append(sub)
@@ -45,7 +45,7 @@ def pull_active_subs() -> pl.DataFrame:
     return sub_frame
 
 
-def pull_cancelled_subs(start_date: str = "", end_date: str = "") -> pl.DataFrame:
+def pull_cancelled_subs(start_date: str = "", end_date: str = "", headers=HEADERS) -> pl.DataFrame:
     """
     Pulls cancelled subscriptions data from the Recharge API and returns it as a Polars DataFrame.
     This function fetches all cancelled subscriptions within the specified date range (if provided).
@@ -81,7 +81,7 @@ def pull_cancelled_subs(start_date: str = "", end_date: str = "") -> pl.DataFram
     progress = tqdm()
     while True:
         progress.update()
-        response = requests.get(url, headers=HEADERS)
+        response = requests.get(url, headers=headers)
         data = json.loads(response.text)
         for sub in data.get("subscriptions", []):
             all_subs.append(sub)
