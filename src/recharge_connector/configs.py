@@ -11,8 +11,10 @@ HEADERS = {
 
 BASE_URL = "https://api.rechargeapps.com"
 BASE_SUB_URL = BASE_URL + "/subscriptions"
+ALL_SUB_PREDICATE = "?limit=250"
 ACTIVE_SUB_PRED = "?limit=250&status=active"
 CANCELLED_SUB_PRED = "?limit=250&status=cancelled"
+ALL_SUB_URL = BASE_SUB_URL + ALL_SUB_PREDICATE
 ACTIVE_SUB_URL = BASE_SUB_URL + ACTIVE_SUB_PRED
 CANCELLED_SUB_URL = BASE_SUB_URL + CANCELLED_SUB_PRED
 BASE_ORDER_URL = BASE_URL + "/orders"

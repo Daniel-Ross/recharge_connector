@@ -1,10 +1,61 @@
-from recharge_connector.configs import ACTIVE_SUB_URL, BASE_SUB_URL, CANCELLED_SUB_URL, HEADERS
-from tqdm import tqdm
-import requests
 import json
 import time
+
 import polars as pl
-from recharge_connector.utils import get_next_url, create_sub_df
+import requests
+from tqdm import tqdm
+
+from recharge_connector.configs import (
+    ACTIVE_SUB_URL,
+    ALL_SUB_URL,
+    BASE_SUB_URL,
+    CANCELLED_SUB_URL,
+    HEADERS,
+)
+from recharge_connector.utils import create_sub_df, get_next_url
+
+
+def pull_all_subs(start_date: str = "", end_date: str = "") -> pl.DataFrame:
+    """Retrieves and processes all subscription data from the Recharge API.
+    This function fetches all subscriptions using pagination, processes the raw data,
+    and returns it in a structured Polars DataFrame format. It handles the API pagination,
+    includes rate limiting protection, and transforms the subscription data by:
+    - Converting variant and product IDs to proper numeric types
+    - Casting price to float
+    - Removing unnecessary fields
+    - Unnesting nested JSON structures
+    Raises:
+        requests.exceptions.RequestException: If there is an error making the API request
+        json.JSONDecodeError: If the API response cannot be parsed as JSON
+    Returns:
+        pl.DataFrame: A Polars DataFrame containing processed subscription data
+    Note:
+        The function uses pagination to retrieve all active subscriptions and includes
+        a 0.5 second delay between API calls to prevent rate limiting.
+    """
+    all_subs = []
+    if start_date and end_date:
+        url = BASE_SUB_URL + f"?created_at_min={start_date}&created_at_max={end_date}"
+    else:
+        url = ALL_SUB_URL
+
+    # url = ALL_SUB_URL
+    progress = tqdm()
+    while True:
+        progress.update()
+        response = requests.get(url, headers=HEADERS)
+        data = json.loads(response.text)
+        for sub in data.get("subscriptions", []):
+            all_subs.append(sub)
+        if not data.get("next_cursor"):
+            break
+        else:
+            url = get_next_url(data, BASE_SUB_URL)
+            if not url:
+                break
+        time.sleep(0.5)
+    sub_frame = create_sub_df(all_subs)
+    return sub_frame
 
 
 def pull_active_subs() -> pl.DataFrame:
@@ -73,7 +124,10 @@ def pull_cancelled_subs(start_date: str = "", end_date: str = "") -> pl.DataFram
     """
     all_subs = []
     if start_date and end_date:
-        url = CANCELLED_SUB_URL + f"&created_at_min={start_date}&created_at_max={end_date}"
+        url = (
+            CANCELLED_SUB_URL
+            + f"&created_at_min={start_date}&created_at_max={end_date}"
+        )
     else:
         url = CANCELLED_SUB_URL
     print(url)
